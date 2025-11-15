@@ -22,6 +22,7 @@ class CommentRequest extends FormRequest
     public function rules(): array
     {
         return [
+            //'user_id' => 'required|exists:users,id',
             'description' => 'required',
         ];
     }
@@ -31,6 +32,8 @@ class CommentRequest extends FormRequest
     public function messages()
     {
          return [
+            // 'user_id.required' => 'User ID is required',
+            // 'user_id.exists' => 'User ID must exist in users table',
             'description.required' => 'Please enter a comment',
         ];
     }

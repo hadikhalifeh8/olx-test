@@ -154,6 +154,15 @@ class TaskController extends Controller
         ], 404);
     }
 
+    // Get task owner
+    $owner = $task->user_rln;
+    if (!$owner || !$owner->email) {
+        return response()->json([
+            'status' => 'failure',
+            'message' => 'Task owner not found or has no email',
+        ], 400);
+    }
+
     // Create comment
     $comment = Comment::create([
         'user_id' => $request->user()->id,
@@ -161,13 +170,18 @@ class TaskController extends Controller
         'description' => $request->description,
     ]);
 
-    // Dispatch email notification job
-     SendCommentNotification::dispatch($task, $request->user(), $request->description);
+    // Dispatch email notification job with explicit parameters
+    SendCommentNotification::dispatch(
+        $task->id,
+        $request->user()->name,
+        $request->description,
+        $owner->email
+    );
 
     return response()->json([
         'status' => 'success',
         'data' => $comment,
-        'message' => 'Comment added and notification queued',
+        'message' => 'Comment added and notification sent',
     ]);
 }
 
